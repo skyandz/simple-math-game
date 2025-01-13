@@ -14,6 +14,6 @@
     - 3 Buttons
     - 3 1 kΩ resistors
    
-- circuit: ![pic](circuit.JPG)
+- Circuit: ![pic](circuit.JPG)
   
-- result: [https://youtu.be/CO5_VvYUaBY](https://youtu.be/CO5_VvYUaBY)
+- Result: [https://youtu.be/CO5_VvYUaBY](https://youtu.be/CO5_VvYUaBY)
