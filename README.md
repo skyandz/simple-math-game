@@ -1,4 +1,4 @@
-# Simple-Math-Game
+# Simple Math Game
 
 - IoT Project
 
