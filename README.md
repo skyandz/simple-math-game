@@ -3,8 +3,8 @@
 - IoT Project
 
 - Descriptions  
-    - Two random numbers were popped up on an LCD screen.
-    - Added them up and entered the answer using buttons.
+    - Two random numbers are popped up on an LCD screen.
+    - Add them up and enter the answer using buttons.
     - If the answer is correct, the screen will display "correct"; otherwise, it will display "wrong"
 
 - tools:
