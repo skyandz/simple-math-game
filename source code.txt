@@ -1,0 +1,174 @@
+#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+/* กำหนดให้รับ input หลักสิบ, หลักหน่วย, submit จากปุ่ม A0, A1, A2 ตามลำดับ */
+const int buttonPin_1 = A0;
+const int buttonPin_2 = A1;
+const int buttonPin_submit = A2;
+
+/* ให้สถานะการกดปุ่มเริ่มต้นเป็น LOW ทุกปุ่ม หรือ เป็นสถานะเมื่อยังไม่ได้กดปุ่ม */
+byte buttonState_1 = LOW; //
+byte buttonState_2 = LOW;
+byte buttonState_submit = LOW;
+
+int randNumber[2] = {0, 0}; // กำหนดค่าเริ่มต้นให้กับตัวแปร randNumber ที่ใช้เก็บค่า random จำนวน 2 ค่า เป็น 0 ทั้งคู่
+
+int n1 = 0, n2 = 0; // กำหนดให้ค่าในหลักสิบและหลักหน่วยเริ่มต้นที่ 0 ทั้งคู่
+
+/* ส */
+byte customChar[] = {
+  B00000,
+  B00000,
+  B00001,
+  B01110,
+  B10001,
+  B00101,
+  B01011,
+  B10001
+};
+
+/* วั */
+byte customChar1[] = {
+  B01000,
+  B01110,
+  B00000,
+  B01110,
+  B01010,
+  B00010,
+  B00110,
+  B00110
+};
+
+/* ดี */
+byte customChar2[] = {
+  B00001,
+  B01111,
+  B00000,
+  B11111,
+  B10001,
+  B10101,
+  B10101,
+  B11101
+};
+
+void setup()
+{
+  lcd.createChar(0, customChar);
+  lcd.createChar(1, customChar1);
+  lcd.createChar(2, customChar2);
+
+  lcd.init();
+  lcd.backlight();
+
+  pinMode(buttonPin_1, INPUT);
+  pinMode(buttonPin_2, INPUT);
+  pinMode(buttonPin_submit, INPUT);
+
+  /* แสดงคำว่า "WELCOME" ทาง LCD */
+  lcd.setCursor(4,0);
+  lcd.print("WELCOME!");
+
+  /* แสดงคำว่า "สวัสดี" ทาง LCD */
+  lcd.setCursor(6,1);
+  lcd.write((byte)0);
+  lcd.setCursor(7,1);
+  lcd.write((byte)1);
+  lcd.setCursor(8,1);
+  lcd.write((byte)0);
+  lcd.setCursor(9,1);
+  lcd.write((byte)2);
+
+  delay(4000); // Delay 4 วินาที่
+
+  lcd.clear();
+
+  randFunc(); // เรัยกใช้ฟังก์ชัน random
+}
+
+void randFunc()
+{
+  /* random ค่า จำนวน 2 ค่า */
+  for (int i = 0; i < 2; i++)
+  {
+    randNumber[i] = random(10);
+  }
+}
+
+void loop() {
+
+  int result = randNumber[0] + randNumber[1]; // นำค่าที่ random มาบวกกันเก็บไว้ที่ตัวแปร result
+
+  /* แสดงโจทย์ในรูป "randomNumber[ตัวที่ 1] + randomNumber[ตัวที่ 2] = " ทาง LCD */
+  lcd.setCursor(6,0);
+  lcd.print(randNumber[0]);
+  lcd.print("+");
+  lcd.print(randNumber[1]);
+  lcd.print("=");
+
+  /* แสดงคำตอบ (ผลบวก) ที่ผู้ใช้ input เข้ามาในรูป "ANS. 00.0" ทาง LCD */
+  lcd.setCursor(0,1);
+  lcd.print("ANS.");
+  lcd.setCursor(12,1);
+  lcd.print(n1);
+  lcd.print(n2);
+  lcd.print(".0");
+
+  delay(4000); // Delay 4 วินาที่
+
+  buttonState_1 = digitalRead(buttonPin_1); // รับ input เมื่อผู้ใช้กดปุ่มเปลี่ยนเลขหลักสิบ
+  buttonState_2 = digitalRead(buttonPin_2); // รับ input เมื่อผู้ใช้กดปุ่มเปลี่ยนเลขหลักหน่วย
+  buttonState_submit = digitalRead(buttonPin_submit); // รับ input เมื่อผู้ใช้กดปุ่ม submit
+
+  /* ถ้าผู้ใช้กดปุ่มเปลี่ยนเลขหลักสิบ 
+  โดยค่าที่สามารถเป็นได้คือ 0-9 */
+  if (buttonState_1 == HIGH)
+  {
+    n1 += 1; 
+    if (n1 == 10) {
+      n1 = 0;
+    }
+  }
+
+  /* ถ้าผู้ใช้กดปุ่มเปลี่ยนเลขหลักหน่วย
+  โดยค่าที่สามารถเป็นได้คือ 0-9 */
+  else if (buttonState_2 == HIGH) 
+  {
+    n2 += 1;
+    if (n2 == 10) {
+      n2 = 0;
+    }
+  }
+
+  /* ถ้าผู้ใช้กดปุ่ม submit */
+  else if (buttonState_submit == HIGH) 
+  {
+    /* ทำค่าในหลักสิบที่ input เข้ามา ให้เป็นหลักสิบที่แท้จริง โดยค่ารับเข้ามาต้องไม่เป็น 0 */
+    if (n1 != 0) {
+      n1 += 9;
+    }
+
+    lcd.clear();
+
+    /* ถ้าผลบวกที่รับเข้ามาถูกต้อง ให้ทำการแสดง "CORRECT" "NICE JOB!" ทาง LCD */
+    if ((n1+n2) == result) {
+      lcd.setCursor(5,0);
+      lcd.print("CORRECT");
+      lcd.setCursor(4,1);
+      lcd.print("NICE JOB!");
+      delay(2000);
+    }
+    else { /* ถ้าผลบวกที่รับเข้ามาไม่ถูกต้อง ให้ทำการแสดง "WRONG" "KEEP GOING!" ทาง LCD */
+      lcd.setCursor(6,0);
+      lcd.print("WRONG");
+      lcd.setCursor(3,1);
+      lcd.print("KEEP GOING!");
+      delay(2000);
+    }
+    lcd.clear();
+    n1 = 0; n2 = 0; // เซ็ตให้เลขในหลักหน่วยและหลักสิบเป็น 0 ทั้งคู่ เพื่อเริ่มต้นบวกเลขในโจทย์ใหม่ต่อไป
+    randFunc(); // เปลี่ยนโจทย์ใหม่โดยการเรียกฟังก์ชัน random หลังจากผู้ใช้กดปุ่ม submit โจทย์ก่อนหน้านั้นแล้ว
+  }
+}
