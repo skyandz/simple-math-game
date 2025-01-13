@@ -8,11 +8,11 @@
     - If the answer is correct, the screen will display "correct"; otherwise, it will display "wrong"
 
 - tools:
-1. Breadboard
-2. Arduino Board
-3. LCD I2C Screen
-4. 3 Buttons
-5. 3 1 kΩ resistors
+-     Breadboard
+-     Arduino Board
+-     LCD I2C Screen
+-     3 Buttons
+-     3 1 kΩ resistors
    
 - circuit: ![pic](circuit.JPG)
   
